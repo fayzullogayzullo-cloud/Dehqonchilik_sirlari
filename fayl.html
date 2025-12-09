@@ -1,132 +1,72 @@
 <!doctype html>
 <html lang="uz">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Fermerlik darslari</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin:0; display:flex; min-height:100vh; }
-        .sidebar { width:240px; background:#2f6b2f; color:#fff; padding:16px; box-sizing:border-box; }
-        .sidebar .logo { font-weight:bold; margin-bottom:12px; }
-        .sidebar a { color:#fff; display:block; padding:8px 6px; text-decoration:none; border-radius:4px; }
-        .sidebar a:hover, .sidebar a.active { background:rgba(255,255,255,0.08); }
-        .main { flex:1; padding:20px; box-sizing:border-box; background:#f6f8f1; }
-        header.header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
-        .video { margin-bottom:18px; }
-        .video h3 { margin:6px 0; }
-        iframe { max-width:100%; border:0; }
-        .video-list { display:grid; gap:14px; grid-template-columns: repeat(auto-fit,minmax(300px,1fr)); }
-        .phone-icon { cursor:pointer; padding:6px 8px; background:#fff; border-radius:4px; color:#2f6b2f; }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>UZB Taxi</title>
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-sA+e2kM0bZ7F2v6wQw4l6wq6jY8w9gQv6b5oY6p0Q3s=" crossorigin=""/>
+
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Small fallback if styles.css not loaded */
+    body{font-family:Arial, sans-serif;margin:0;display:flex;min-height:100vh}
+  </style>
 </head>
 <body>
-    <aside class="sidebar" id="sidebar">
-        <div class="logo">Fermerlik Darslari</div>
-        <nav>
-            <a href="#" class="sidebar-link active" data-category="livestock">Chorva Dehqonchilik</a>
-            <a href="#" class="sidebar-link" data-category="crop-farming">Dehqonchilik</a>
-            <a href="#" class="sidebar-link" data-category="vegetable-farming">Sabzavotchilik</a>
-            <a href="#" class="sidebar-link" data-category="fruit-farming">Meva Yetishtirish</a>
-        </nav>
-    </aside>
+  <aside class="sidebar">
+    <div class="logo">UZB Taxi</div>
+    <nav>
+      <a href="#" class="nav-link active">Bosh sahifa</a>
+      <a href="#" class="nav-link">Buyurtmalar</a>
+      <a href="#" class="nav-link">Profil</a>
+      <a href="#" class="nav-link">Yordam</a>
+    </nav>
+    <div class="contact">Bog'lanish: +998 94 258 60 45</div>
+  </aside>
 
-    <main class="main">
-        <header class="header" id="header">
-            <div><strong id="category-title">Kategoriya</strong></div>
-            <div>
-                <button class="phone-icon" id="phone-icon" title="Bog'lanish">+998 94 258 60 45</button>
-            </div>
-        </header>
+  <main class="main">
+    <header class="topbar">
+      <h1>O‘zbekcha Taxi — Tez va ishonchli</h1>
+    </header>
 
-        <section class="video-section">
-            <h2 id="section-title">Videolar</h2>
-            <div id="video-list" class="video-list"></div>
-        </section>
-    </main>
+    <section class="controls">
+      <div class="form">
+        <label>Olgan joy (pickup):
+          <input id="pickup-input" placeholder="Manzilni yozing yoki xaritada bosing" />
+        </label>
+        <label>Tashqariga tushish (dropoff):
+          <input id="dropoff-input" placeholder="Manzilni yozing yoki xaritada bosing" />
+        </label>
+        <div class="btn-row">
+          <button id="set-pickup-btn">Xaritada pickup qo'ying</button>
+          <button id="set-drop-btn">Xaritada dropoff qo'ying</button>
+          <button id="request-ride-btn" class="primary">Buyurtma yuborish</button>
+        </div>
+      </div>
 
-    <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        // JSON data (agar xohlasangiz alohida videos.json ga o'zgartiring)
-        const videosData = {
-            "livestock": [
-                { "title": "Introduction to Livestock Farming", "link": "https://www.youtube.com/embed/dQw4w9WgXcQ" },
-                { "title": "Livestock Management Basics", "link": "https://www.youtube.com/embed/3JZ_D3ELwOQ" }
-            ],
-            "crop-farming": [
-                { "title": "Basics of Crop Farming", "link": "https://www.youtube.com/embed/2Vv-BfVoq4g" },
-                { "title": "Effective Crop Techniques", "link": "https://www.youtube.com/embed/kJQP7kiw5Fk" }
-            ],
-            "vegetable-farming": [
-                { "title": "Vegetable Garden Tips", "link": "https://www.youtube.com/embed/VbfpW0pbvaU" }
-            ],
-            "fruit-farming": [
-                { "title": "Fruit Tree Care", "link": "https://www.youtube.com/embed/09R8_2nJtjg" }
-            ]
-        };
+      <div class="summary">
+        <h3>Buyurtma ma'lumotlari</h3>
+        <div id="estimation">Manzillar tanlanmagan.</div>
+        <h4>Yaqin taksilar</h4>
+        <ul id="drivers-list" class="drivers-list"></ul>
+      </div>
+    </section>
 
-        const links = document.querySelectorAll('.sidebar-link');
-        const listEl = document.getElementById('video-list');
-        const categoryTitle = document.getElementById('category-title');
+    <section id="map" class="map"></section>
 
-        links.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                links.forEach(l=>l.classList.remove('active'));
-                link.classList.add('active');
-                const cat = link.dataset.category;
-                categoryTitle.textContent = link.textContent;
-                loadVideos(cat);
-            });
-        });
+    <section class="status-panel">
+      <h3>Holat</h3>
+      <div id="ride-status">Hech qanday buyurtma yo'q.</div>
+    </section>
+  </main>
 
-        document.getElementById('phone-icon').addEventListener('click', () => {
-            alert('Telefon: +998 94 258 60 45');
-        });
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-V6r+7n3b7zGY0kq2la0F5a4z6W9mFvXy3r2xR6q6o8g=" crossorigin=""></script>
 
-        // Load first category by default
-        const firstCategory = links[0].dataset.category;
-        categoryTitle.textContent = links[0].textContent;
-        loadVideos(firstCategory);
-
-        function loadVideos(category) {
-            const videos = videosData[category] || [];
-            displayVideos(videos);
-        }
-
-        function displayVideos(videos) {
-            listEl.innerHTML = '';
-            if (videos.length === 0) {
-                listEl.innerHTML = '<p>Bu kategoriyada video yo‘q.</p>';
-                return;
-            }
-            videos.forEach(video => {
-                const wrap = document.createElement('div');
-                wrap.className = 'video';
-
-                const title = document.createElement('h3');
-                title.textContent = video.title;
-
-                const iframe = document.createElement('iframe');
-                iframe.width = '560';
-                iframe.height = '315';
-                iframe.src = video.link;
-                iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
-                iframe.allowFullscreen = true;
-
-                const link = document.createElement('a');
-                const watchUrl = video.link.includes('/embed/') ? video.link.replace('/embed/','/watch?v=') : video.link;
-                link.href = watchUrl;
-                link.target = '_blank';
-                link.textContent = 'YouTube’da ochish';
-
-                wrap.appendChild(title);
-                wrap.appendChild(iframe);
-                wrap.appendChild(link);
-
-                listEl.appendChild(wrap);
-            });
-        }
-    });
-    </script>
+  <script src="script.js"></script>
 </body>
 </html>
