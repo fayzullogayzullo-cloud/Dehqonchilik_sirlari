@@ -3,17 +3,16 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>UZB Taxi</title>
+  <title>UZB Taxi — Tez va ishonchli</title>
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     integrity="sha256-sA+e2kM0bZ7F2v6wQw4l6wq6jY8w9gQv6b5oY6p0Q3s=" crossorigin=""/>
 
   <link rel="stylesheet" href="styles.css">
-  <style>
-    /* Small fallback if styles.css not loaded */
-    body{font-family:Arial, sans-serif;margin:0;display:flex;min-height:100vh}
-  </style>
 </head>
 <body>
   <aside class="sidebar">
@@ -29,25 +28,26 @@
 
   <main class="main">
     <header class="topbar">
-      <h1>O‘zbekcha Taxi — Tez va ishonchli</h1>
+      <h1>O‘zbekcha Taxi</h1>
+      <p class="subtitle">Tez, ishonchli va qulay — demo versiya (to'lov tizimisiz)</p>
     </header>
 
     <section class="controls">
-      <div class="form">
+      <div class="form card">
         <label>Olgan joy (pickup):
           <input id="pickup-input" placeholder="Manzilni yozing yoki xaritada bosing" />
         </label>
-        <label>Tashqariga tushish (dropoff):
+        <label>Tushish joyi (dropoff):
           <input id="dropoff-input" placeholder="Manzilni yozing yoki xaritada bosing" />
         </label>
         <div class="btn-row">
-          <button id="set-pickup-btn">Xaritada pickup qo'ying</button>
-          <button id="set-drop-btn">Xaritada dropoff qo'ying</button>
-          <button id="request-ride-btn" class="primary">Buyurtma yuborish</button>
+          <button id="set-pickup-btn" class="btn">Xaritada pickup qo'ying</button>
+          <button id="set-drop-btn" class="btn">Xaritada dropoff qo'ying</button>
+          <button id="request-ride-btn" class="btn primary">Buyurtma yuborish</button>
         </div>
       </div>
 
-      <div class="summary">
+      <div class="summary card">
         <h3>Buyurtma ma'lumotlari</h3>
         <div id="estimation">Manzillar tanlanmagan.</div>
         <h4>Yaqin taksilar</h4>
@@ -55,12 +55,16 @@
       </div>
     </section>
 
-    <section id="map" class="map"></section>
+    <section id="map" class="map card"></section>
 
-    <section class="status-panel">
+    <section class="status-panel card">
       <h3>Holat</h3>
       <div id="ride-status">Hech qanday buyurtma yo'q.</div>
     </section>
+
+    <footer class="footer">
+      <div>© UZB Taxi — demo</div>
+    </footer>
   </main>
 
   <!-- Leaflet JS -->
